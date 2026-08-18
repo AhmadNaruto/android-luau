@@ -14,6 +14,16 @@ class LuauStateTest {
         @JvmStatic
         @BeforeClass
         fun setUp() {
+            val envLibPath = System.getenv("LUAU_ANDROID_TEST_LIB")
+            if (envLibPath != null) {
+                val file = File(envLibPath)
+                if (file.exists()) {
+                    println("Loading libluau.so from LUAU_ANDROID_TEST_LIB: ${file.absolutePath}")
+                    System.load(file.absolutePath)
+                    return
+                }
+            }
+
             val buildDir = File("build")
             var libFile: File? = null
             

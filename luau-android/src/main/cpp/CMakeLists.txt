@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project("luau-jni" LANGUAGES C CXX)
 
+# Enforce Position Independent Code (required for JNI shared libraries and static linkage)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Require C++17 as mandated by upstream Luau
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,10 +30,23 @@ target_include_directories(luau PRIVATE
     luau/Common/include
 )
 
-# Link against the static Luau libraries and Android logging
-target_link_libraries(luau PRIVATE
-    Luau.VM
-    Luau.Compiler
-    Luau.Ast
-    log
-)
+if(NOT ANDROID)
+    find_package(JNI REQUIRED)
+    target_include_directories(luau PRIVATE ${JNI_INCLUDE_DIRS})
+endif()
+
+# Link against the static Luau libraries and Android logging (if compiling for Android)
+if(ANDROID)
+    target_link_libraries(luau PRIVATE
+        Luau.VM
+        Luau.Compiler
+        Luau.Ast
+        log
+    )
+else()
+    target_link_libraries(luau PRIVATE
+        Luau.VM
+        Luau.Compiler
+        Luau.Ast
+    )
+endif()

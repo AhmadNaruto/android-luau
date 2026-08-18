@@ -25,5 +25,13 @@ jobs:
       - name: Setup Android SDK Licenses
         run: yes | sdkmanager --licenses || true
 
+      - name: Build Host JNI Library
+        run: |
+          mkdir -p host-build && cd host-build
+          cmake ../luau-android/src/main/cpp
+          make -j$(nproc)
+
       - name: Run Unit Tests
+        env:
+          LUAU_ANDROID_TEST_LIB: ${{ github.workspace }}/host-build/libluau.so
         run: ./gradlew test
