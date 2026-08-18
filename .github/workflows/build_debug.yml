@@ -26,13 +26,13 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Upload Library AAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: luau-android-debug-aar
           path: luau-android/build/outputs/aar/luau-android-debug.aar
 
       - name: Upload Sample APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sample-app-debug-apk
           path: sample/build/outputs/apk/debug/sample-debug.apk
