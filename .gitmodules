@@ -1,0 +1,3 @@
+[submodule "luau-android/src/main/cpp/luau"]
+	path = luau-android/src/main/cpp/luau
+	url = https://github.com/luau-lang/luau.git
