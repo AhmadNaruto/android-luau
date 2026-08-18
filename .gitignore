@@ -1,0 +1,23 @@
+# Gradle caches and outputs
+.gradle/
+build/
+luau-android/build/
+sample/build/
+
+# Local SDK configuration
+local.properties
+
+# Native C++ build caches
+.cxx/
+luau-android/.cxx/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project rules ignore
+GEMINI.md
