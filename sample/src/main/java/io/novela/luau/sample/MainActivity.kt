@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import io.novela.luau.LuauState
-import io.novela.luau.SandboxConfig
+import io.novela.luau.LuauException
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,10 +16,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(tv)
 
         try {
-            // Instantiate Luau State with default safe configurations (sandboxed)
-            val state = LuauState.createState(SandboxConfig.defaultSafe())
+            // 1. Create standard non-sandboxed LuauState
+            val state = LuauState.createState()
             
-            // Register a Kotlin callback
+            // 2. Register Kotlin callback
             state.pushCallback { s ->
                 val name = s.getString(1)
                 s.pushString("Hello, $name from Kotlin callback!")
@@ -27,19 +27,29 @@ class MainActivity : AppCompatActivity() {
             }
             state.setGlobal("greet")
             
-            // Execute script
-            state.execute("result = greet('Android Developer')")
+            // 3. Sandbox the state to enforce read-only environment for execution
+            state.sandbox()
             
-            // Retrieve global result
-            state.getGlobal("result")
+            // 4. Load script onto stack as a closure
+            state.load("return greet('Android Developer')")
+            
+            // 5. Run the loaded script closure (1 result expected, nargs = 0)
+            val runStatus = state.pcall(0, 1)
+            if (runStatus != 0) {
+                val error = state.getString(-1)
+                state.pop(1)
+                throw LuauException("Script run failed: $error")
+            }
+            
+            // 6. Retrieve result from stack
             val output = state.getString(-1)
             state.pop(1)
             
             state.close()
             
             tv.text = "Luau Script Execution Result:\n\n$output"
-        } catch (e: Exception) {
-            tv.text = "Error executing Luau Script:\n\n${e.message}"
+        } catch (e: Throwable) {
+            tv.text = "Error executing Luau Script:\n\n${e.message}\n\nStacktrace:\n${android.util.Log.getStackTraceString(e)}"
         }
     }
 }
